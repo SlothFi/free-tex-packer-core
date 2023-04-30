@@ -1,16 +1,3 @@
-declare module 'free-tex-packer-core' {
-  export default function pack(
-    files: Array<{ path: string; contents: Buffer }>,
-    config?: TexturePackerOptions,
-    callback?: (files: Array<{ name: string, buffer: Buffer }>, error?: Error) => void,
-  ): void;
-
-  export function packAsync(
-    files: Array<{ path: string; contents: Buffer }>,
-    config?: TexturePackerOptions,
-  ): Promise<Array<{ name: string, buffer: Buffer }>>;
-}
-
 /**
  * Trim mode for sprites
  *
@@ -25,7 +12,7 @@ export enum TrimMode {
    *  Original sprite has size 64x64, after removing transparent pixels its real size will be reduced to 32x28,
    *  which will be written as frame size, but original frame size will stay the same: 64x64
    */
-  TRIM = 'trim',
+  TRIM = "trim",
   /**
    * Remove transparent pixels from sides, and update frame size
    *
@@ -33,7 +20,7 @@ export enum TrimMode {
    *  Original sprite has size 64x64, after removing transparent pixels its real size will be reduced to 32x28,
    *  which will be written as frame size, and original frame size will be reduced to the same dimensions
    */
-  CROP = 'crop',
+  CROP = "crop",
 }
 
 /**
@@ -42,8 +29,8 @@ export enum TrimMode {
  * @see TexturePackerOptions.textureFormat
  */
 export enum TextureFormat {
-  PNG = 'png',
-  JPG = 'jpg',
+  PNG = "png",
+  JPG = "jpg",
 }
 
 /**
@@ -56,9 +43,9 @@ export enum TextureFormat {
  * @see MaxRectsPackerMethod
  */
 export enum PackerType {
-  MAX_RECTS_BIN = 'MaxRectsBin',
-  MAX_RECTS_PACKER = 'MaxRectsPacker',
-  OPTIMAL_PACKER = 'OptimalPacker'
+  MAX_RECTS_BIN = "MaxRectsBin",
+  MAX_RECTS_PACKER = "MaxRectsPacker",
+  OPTIMAL_PACKER = "OptimalPacker",
 }
 
 /**
@@ -67,11 +54,11 @@ export enum PackerType {
  * @see TexturePackerOptions.packerMethod
  */
 export enum MaxRectsBinMethod {
-  BEST_SHORT_SIDE_FIT = 'BestShortSideFit',
-  BEST_LONG_SIDE_FIT = 'BestLongSideFit',
-  BEST_AREA_FIT = 'BestAreaFit',
-  BOTTOM_LEFT_RULE = 'BottomLeftRule',
-  CONTACT_POINT_RULE = 'ContactPointRule',
+  BEST_SHORT_SIDE_FIT = "BestShortSideFit",
+  BEST_LONG_SIDE_FIT = "BestLongSideFit",
+  BEST_AREA_FIT = "BestAreaFit",
+  BOTTOM_LEFT_RULE = "BottomLeftRule",
+  CONTACT_POINT_RULE = "ContactPointRule",
 }
 
 /**
@@ -80,12 +67,12 @@ export enum MaxRectsBinMethod {
  * @see TexturePackerOptions.packerMethod
  */
 export enum MaxRectsPackerMethod {
-  SMART = 'Smart',
-  SQUARE = 'Square',
-  SMART_SQUARE = 'SmartSquare',
-  SMART_AREA = 'SmartArea',
-  SQUARE_AREA = 'SquareArea',
-  SMART_SQUARE_AREA = 'SmartSquareArea'
+  SMART = "Smart",
+  SQUARE = "Square",
+  SMART_SQUARE = "SmartSquare",
+  SMART_AREA = "SmartArea",
+  SQUARE_AREA = "SquareArea",
+  SMART_SQUARE_AREA = "SmartSquareArea",
 }
 
 /**
@@ -97,21 +84,21 @@ export enum MaxRectsPackerMethod {
  * @see PackerExporter
  */
 export enum PackerExporterType {
-  JSON_HASH = 'JsonHash',
-  JSON_ARRAY = 'JsonArray',
-  CSS = 'Css',
-  OLD_CSS = 'OldCss',
-  PIXI = 'Pixi',
-  PHASER_HASH = 'PhaserHash',
-  PHASER_ARRAY = 'PhaserArray',
-  PHASER3 = 'Phaser3',
-  XML = 'XML',
-  STARLING = 'Starling',
-  COCOS2D = 'Cocos2d',
-  SPINE = 'Spine',
-  UNREAL = 'Unreal',
-  UIKIT = 'UIKit',
-  UNITY3D = 'Unity3D',
+  JSON_HASH = "JsonHash",
+  JSON_ARRAY = "JsonArray",
+  CSS = "Css",
+  OLD_CSS = "OldCss",
+  PIXI = "Pixi",
+  PHASER_HASH = "PhaserHash",
+  PHASER_ARRAY = "PhaserArray",
+  PHASER3 = "Phaser3",
+  XML = "XML",
+  STARLING = "Starling",
+  COCOS2D = "Cocos2d",
+  SPINE = "Spine",
+  UNREAL = "Unreal",
+  UIKIT = "UIKit",
+  UNITY3D = "Unity3D",
 }
 
 /**
@@ -120,9 +107,9 @@ export enum PackerExporterType {
  * @see TexturePackerOptions.filter
  */
 export enum BitmapFilterType {
-  GRAYSCALE = 'grayscale',
-  MASK = 'mask',
-  NONE = 'none',
+  GRAYSCALE = "grayscale",
+  MASK = "mask",
+  NONE = "none",
 }
 
 /**
@@ -289,10 +276,10 @@ export interface TexturePackerOptions {
 }
 
 export enum ScaleMethod {
-  BILINEAR = 'BILINEAR',
-  NEAREST_NEIGHBOR = 'NEAREST_NEIGHBOR',
-  HERMITE = 'HERMITE',
-  BEZIER = 'BEZIER',
+  BILINEAR = "BILINEAR",
+  NEAREST_NEIGHBOR = "NEAREST_NEIGHBOR",
+  HERMITE = "HERMITE",
+  BEZIER = "BEZIER",
 }
 
 /**
