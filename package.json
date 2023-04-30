@@ -1,5 +1,6 @@
 {
-  "name": "optimized-texture-packer",
+  "name": "@slothfi/texture-packer",
+  "version": "1.0.0",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
