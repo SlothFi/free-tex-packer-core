@@ -3,5 +3,6 @@
 
 #node modules
 node_modules/*
+lib
 
 package-lock.json

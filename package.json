@@ -1,34 +1,10 @@
 {
-  "name": "free-tex-packer-core",
-  "displayName": "Free texture packer",
-  "version": "0.3.4",
-  "description": "Free texture packer core",
-  "url": "http://github.com/odrick/free-tex-packer-core",
+  "name": "optimized-texture-packer",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "build": "tsc index.ts"
+    "build": "tsc"
   },
-  "keywords": [
-    "texture",
-    "packer",
-    "gulp",
-    "gulpjs",
-    "gulpplugin",
-    "texturepacker",
-    "texture-packer",
-    "sprites",
-    "spritesheet",
-    "export",
-    "sprite",
-    "2d"
-  ],
-  "author": "Alexander Norinchak",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/odrick/free-tex-packer-core"
-  },
-  "license": "MIT",
   "dependencies": {
     "@jvitela/mustache-wax": "^1.0.1",
     "fs": "^0.0.1-security",
@@ -36,10 +12,10 @@
     "maxrects-packer": "^2.5.0",
     "mustache": "^4.2.0",
     "path": "^0.12.7",
-    "tinify": "^1.5.0",
-    "typescript": "^5.0.4"
+    "tinify": "^1.5.0"
   },
   "devDependencies": {
-    "@types/node": "^13.1.0"
+    "@types/node": "^13.1.0",
+    "typescript": "^5.0.4"
   }
 }

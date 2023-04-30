@@ -10,39 +10,20 @@ import FilesProcessor from "./FilesProcessor";
  */
 export class OptimizedTexturePacker {
   static readonly SUPPORTED_IMAGE_FORMATS = /(.jpg|.png)/;
-  static readonly DEFAULT_PACKER_OPTIONS: TexturePackerOptions = {
-    padding: 1,
-    allowRotation: false,
-    detectIdentical: true,
-    // powerOfTwo: true,
-    allowTrim: true,
-    //@ts-ignore
-    exporter: "Phaser3",
-    removeFileExtension: true,
-    prependFolderName: true,
-    //@ts-ignore
-    scaleMethod: "NEAREST_NEIGHBOR",
-    //@ts-ignore
-    packer: "MaxRectsPacker",
-  };
-
   readonly frames: Record<string, Jimp> = {};
-  frameNames: string[];
+  frameNames!: string[];
 
-  options: TexturePackerOptions;
+  readonly options: TexturePackerOptions;
 
   constructor(
     protected readonly targetAssetFolders: string[],
-    options: Partial<TexturePackerOptions> = {}
+    options: TexturePackerOptions
   ) {
-    this.options = validateOptions({
-      ...OptimizedTexturePacker.DEFAULT_PACKER_OPTIONS,
-      ...options,
-    });
+    this.options = validateOptions(options);
   }
 
   async pack(filterPredicate: (frameName: string) => boolean) {
-    const filteredFrames = {};
+    const filteredFrames: Record<string, Jimp> = {};
     /**
      * Filter Frames
      */
