@@ -8,5 +8,6 @@
     "allowJs": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "lib"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
