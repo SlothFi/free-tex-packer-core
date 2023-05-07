@@ -102,74 +102,15 @@ export enum PackerExporterType {
 }
 
 /**
- * Bitmap filter, applicable to output atlas texture
- *
- * @see TexturePackerOptions.filter
- */
-export enum BitmapFilterType {
-  GRAYSCALE = "grayscale",
-  MASK = "mask",
-  NONE = "none",
-}
-
-/**
  * Texture packer options
  */
 export interface TexturePackerOptions {
-  /**
-   * Name of output files.
-   *
-   * @default pack-result
-   */
-  textureName?: string;
-
-  /**
-   * Max single texture width in pixels
-   *
-   * @default 2048
-   */
-  width?: number;
-  /**
-   * Max single texture height in pixels
-   *
-   * @default 2048
-   */
-  height?: number;
-  /**
-   * Fixed texture size
-   *
-   * @default false
-   */
-  fixedSize?: boolean;
-  /**
-   * Force power of two textures sizes
-   *
-   * @default false
-   */
-  powerOfTwo?: boolean;
   /**
    * Spaces in pixels around images
    *
    * @default 0
    */
   padding?: number;
-  /**
-   * Extrude border pixels size around images
-   *
-   * @default 0
-   */
-  extrude?: number;
-  /**
-   * Allow image rotation
-   * @default true
-   */
-  allowRotation?: boolean;
-  /**
-   * Allow detect identical images
-   *
-   * @default true
-   */
-  detectIdentical?: boolean;
   /**
    * Allow trim images
    *
@@ -210,24 +151,6 @@ export interface TexturePackerOptions {
    */
   textureFormat?: TextureFormat;
   /**
-   * Export texture as base64 string to atlas meta tag
-   *
-   * @default false
-   */
-  base64Export?: boolean;
-  /**
-   * Scale size and positions in atlas
-   *
-   * @default 1
-   */
-  scale?: number;
-  /**
-   * Texture scaling method
-   *
-   * @default ScaleMethod.BILINEAR
-   */
-  scaleMethod?: ScaleMethod;
-  /**
    * "Tinify" texture using TinyPNG
    *
    * @default false
@@ -240,39 +163,11 @@ export interface TexturePackerOptions {
    */
   tinifyKey?: string;
   /**
-   * Type of packer
-   * @see PackerType
-   * @default {@link PackerType.MAX_RECTS_BIN}
-   */
-  packer?: PackerType;
-  /**
-   * Pack method
-   *
-   * @default {@link MaxRectsBinMethod.BEST_SHORT_SIDE_FIT}
-   * @see MaxRectsBinMethod
-   * @see MaxRectsPackerMethod
-   */
-  packerMethod?: MaxRectsBinMethod | MaxRectsPackerMethod;
-  /**
    * Name of predefined exporter (), or custom exporter (see below)
    *
    * @default JsonHash
    */
   exporter?: PackerExporterType | PackerExporter;
-  /**
-   * Bitmap filter type
-   *
-   * @see BitmapFilterType
-   * @default {@link BitmapFilterType.NONE}
-   */
-  filter?: BitmapFilterType;
-  /**
-   * External application info.
-   * Required fields: url and version
-   *
-   * @default null
-   */
-  appInfo?: any;
 }
 
 export enum ScaleMethod {
