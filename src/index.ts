@@ -286,7 +286,7 @@ export default class OptimizedTexturePacker {
   ) {
     return path.join(
       OptimizedTexturePacker.TEMP_ASSET_PATH,
-      isTextureFile ? `${hash}.json` : `${hash}-${textureIndex!}.png`
+      isTextureFile ? `${hash}-${textureIndex!}.png` : `${hash}.json`
     );
   }
 }
