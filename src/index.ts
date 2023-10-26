@@ -33,7 +33,10 @@ export default class OptimizedTexturePacker {
   readonly duplicateFrames: Frame[] = [];
 
   constructor(
-    protected readonly targetAssetFolders: string[],
+    protected readonly assetFolderPaths: {
+      path: string;
+      customPrefix?: string;
+    }[],
     readonly options: TexturePackerOptions,
     readonly packerOptions?: Omit<PackerOptions, "allowRotation">
   ) {}
@@ -46,8 +49,11 @@ export default class OptimizedTexturePacker {
     /**
      * Go through all target asset folders and Add image textures
      */
-    for (const targetAssetFolder of this.targetAssetFolders)
-      await this.addFrames(targetAssetFolder);
+    for (const { path: folderPath, customPrefix } of this.assetFolderPaths)
+      await this.addFrames(
+        folderPath,
+        customPrefix ?? path.basename(folderPath)
+      );
 
     /**
      * Pre-trim frames
@@ -131,7 +137,7 @@ export default class OptimizedTexturePacker {
         if (!err) resolve(data);
         else {
           /** Generate JSON Data */
-          const jsonData = JSONRenderer.render(frames, bins);
+          const jsonData = JSONRenderer.render(this.options, frames, bins);
 
           /** Save to file system for future */
           await new Promise<void>((res, rej) =>
@@ -201,37 +207,26 @@ export default class OptimizedTexturePacker {
   /**
    * Add Frames From target asset path which can be direct path to image or folder containing them
    */
-  private async addFrames(targetAssetPath: string, frameNamePrefix?: string) {
-    const baseName = path.basename(targetAssetPath);
-    let frameName =
-      this.options.prependFolderName && frameNamePrefix
-        ? `${frameNamePrefix}/${baseName}`
-        : baseName;
-    /**
-     * Check if it's image
-     */
-    if (OptimizedTexturePacker.IMAGE_FORMATS.test(targetAssetPath)) {
-      /** Remove extension */
-      if (this.options.removeFileExtension)
-        frameName = frameName.replace(OptimizedTexturePacker.IMAGE_FORMATS, "");
-
-      /** Read Content */
-      const contents = fs.readFileSync(targetAssetPath);
-
+  private async addFrames(folderPath: string, prefix: string) {
+    for (const _subDir of fs.readdirSync(folderPath)) {
+      const subDir = path.join(folderPath, _subDir);
       /**
-       * Add Frame
+       * Check if subDir is directory and recursively add frame from that folder too
        */
-      await this.addFrame(frameName, contents);
-    } else {
+      if (fs.lstatSync(subDir).isDirectory())
+        await this.addFrames(subDir, `${prefix}/${_subDir}`);
       /**
-       * Treat Path as folder and check for it's contents
-       */
-      const contents = fs.readdirSync(targetAssetPath, "utf-8");
-      for (const contentPath of contents)
-        await this.addFrames(
-          path.join(targetAssetPath, contentPath),
-          frameName
+       * Check if it's supported image
+       */ else if (OptimizedTexturePacker.IMAGE_FORMATS.test(_subDir))
+        await this.addFrame(
+          `${prefix}/${
+            this.options.removeFileExtension
+              ? _subDir.replace(OptimizedTexturePacker.IMAGE_FORMATS, "")
+              : _subDir
+          }`,
+          fs.readFileSync(subDir)
         );
+      else console.log(subDir, "not supported, skipping");
     }
   }
 
