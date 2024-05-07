@@ -1,29 +1,27 @@
-import Jimp from "jimp";
 import { Bin, Rectangle } from "maxrects-packer";
 import { Frame } from "..";
 import { TexturePackerOptions } from "../types";
+import { PNG } from "pngjs";
 
 export namespace TextureRenderer {
-  export async function render(bin: Bin<Rectangle>) {
+  export function render(bin: Bin<Rectangle>) {
     /** */
     const { width, height, rects } = bin;
 
     /**
      * Create Blank Texture
      */
-    const texture = new Jimp(width, height, 0x0);
+    const texture = new PNG({ width, height });
 
     /**
      * Render All Frames
      */
     for (const rect of rects) renderFrame(texture, rect, rect.data[0]);
 
-    return await texture.getBufferAsync("image/png");
+    return texture.pack();
   }
 
-  function renderFrame(texture: Jimp, { x, y }: Rectangle, frame: Frame) {
-    let img = frame.image;
-
+  function renderFrame(texture: PNG, { x, y }: Rectangle, frame: Frame) {
     let dx = x;
     let dy = y;
     let sx = frame.spriteSourceSize.x;
@@ -31,6 +29,6 @@ export namespace TextureRenderer {
     let sw = frame.spriteSourceSize.w;
     let sh = frame.spriteSourceSize.h;
 
-    texture.blit(img, dx, dy, sx, sy, sw, sh);
+    frame.image.bitblt(texture, sx, sy, sw, sh, dx, dy);
   }
 }
