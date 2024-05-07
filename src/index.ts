@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
-import os from "os";
-import Jimp from "jimp";
+import { PNG } from "pngjs";
 import { TexturePackerOptions } from "./types";
 import Trimmer from "./utils/Trimmer";
 import {
@@ -20,7 +19,7 @@ export interface Frame {
   sourceSize: { w: number; h: number };
   spriteSourceSize: { [key in "x" | "y" | "w" | "h"]: number };
   frame: { [key in "x" | "y" | "w" | "h"]: number };
-  image: Jimp;
+  image: PNG;
   original?: Frame;
 }
 
@@ -28,7 +27,6 @@ export interface Frame {
  * Optimized version of texture packer for real-time texture atlas packing
  */
 export default class OptimizedTexturePacker {
-  static readonly IMAGE_FORMATS = /(.jpg|.png)/;
   readonly frames: Frame[] = [];
   readonly duplicateFrames: Frame[] = [];
 
@@ -129,30 +127,20 @@ export default class OptimizedTexturePacker {
      */
     const jsonPath = OptimizedTexturePacker.ConstructTempFileName(hash, false);
 
-    return await new Promise<string>((resolve) => {
-      /**
-       * Read texture file in fs and return it directly if it exists, otherwise generate
-       */
-      fs.readFile(jsonPath, "utf-8", async (err, data) => {
-        if (!err) resolve(data);
-        else {
-          /** Generate JSON Data */
-          const jsonData = JSONRenderer.render(this.options, frames, bins);
+    /**
+     * Check if cache in file system exists
+     */
+    if (!fs.existsSync(jsonPath)) {
+      /** Generate JSON Data */
+      const jsonData = JSONRenderer.render(this.options, frames, bins);
 
-          /** Save to file system for future */
-          await new Promise<void>((res, rej) =>
-            fs.writeFile(jsonPath, jsonData, { encoding: "utf-8" }, (err) =>
-              err ? rej(err) : res()
-            )
-          );
-
-          /**
-           * Return JSON Data
-           */
-          resolve(jsonData);
-        }
+      /** Save to file system   */
+      await fs.promises.writeFile(jsonPath, jsonData, {
+        encoding: "utf-8",
       });
-    });
+    }
+
+    return jsonPath;
   }
 
   async generateTexture(frames: Frame[], textureIndex: number = 0) {
@@ -163,41 +151,29 @@ export default class OptimizedTexturePacker {
     if (!bins[textureIndex])
       throw new RangeError(`Texture index ${textureIndex} is out of range`);
 
-    /**
-     * Check if we have generated texture already and cached it in filesystem
-     */
     const texturePath = OptimizedTexturePacker.ConstructTempFileName(
       hash,
       true,
       textureIndex
     );
 
-    return await new Promise<Buffer>((resolve) => {
-      /**
-       * Read texture file in fs and return it directly if it exists, otherwise generate
-       */
-      fs.readFile(texturePath, null, async (err, data) => {
-        if (!err) resolve(data);
-        else {
-          /** Generate Texture */
-          const textureBuffer = await TextureRenderer.render(
-            bins[textureIndex]
-          );
+    /**
+     * Check if we have generated texture already and cached it in file system
+     */
+    if (!fs.existsSync(texturePath)) {
+      /** Generate Texture */
+      const texture = TextureRenderer.render(bins[textureIndex]);
 
-          /** Save to file system for future */
-          await new Promise<void>((res, rej) =>
-            fs.writeFile(texturePath, textureBuffer, (err) =>
-              err ? rej(err) : res()
-            )
-          );
+      /** Save */
+      await new Promise((resolve, reject) =>
+        texture
+          .pipe(fs.createWriteStream(texturePath))
+          .once("finish", resolve)
+          .once("error", reject)
+      );
+    }
 
-          /**
-           * Return Texture Buffer
-           */
-          resolve(textureBuffer);
-        }
-      });
-    });
+    return texturePath;
   }
 
   filterFrames(filterPredicate: (frameName: string, frame: Frame) => boolean) {
@@ -208,61 +184,72 @@ export default class OptimizedTexturePacker {
    * Add Frames From target asset path which can be direct path to image or folder containing them
    */
   private async addFrames(folderPath: string, prefix: string) {
-    for (const _subDir of fs.readdirSync(folderPath)) {
-      const subDir = path.join(folderPath, _subDir);
-      /**
-       * Check if subDir is directory and recursively add frame from that folder too
-       */
-      if (fs.lstatSync(subDir).isDirectory())
-        await this.addFrames(subDir, `${prefix}/${_subDir}`);
-      /**
-       * Check if it's supported image
-       */ else if (OptimizedTexturePacker.IMAGE_FORMATS.test(_subDir))
-        await this.addFrame(
-          `${prefix}/${
-            this.options.removeFileExtension
-              ? _subDir.replace(OptimizedTexturePacker.IMAGE_FORMATS, "")
-              : _subDir
-          }`,
-          fs.readFileSync(subDir)
-        );
-      else console.log(subDir, "not supported, skipping");
-    }
-  }
+    const dir = await fs.promises.readdir(folderPath);
 
-  private async addFrame(name: string, contents: Buffer) {
-    /**
-     * Preload Image as Texture-packer would do under the hood
-     */
-    const image = await Jimp.read(contents);
-    const { width: w, height: h } = image.bitmap;
-
-    /**
-     * Check if we have identical frame already stored
-     */
-    const originalFrame = this.frames.find((frame) =>
-      frame.image.bitmap.data.equals(image.bitmap.data)
+    await Promise.all(
+      dir.map(async (_subDir) => {
+        const subDir = path.join(folderPath, _subDir);
+        /**
+         * Check if it's supported image
+         */ if (_subDir.endsWith(".png"))
+          await this.addFrame(
+            `${prefix}/${
+              this.options.removeFileExtension
+                ? _subDir.replace(".png", "")
+                : _subDir
+            }`,
+            subDir
+          );
+        /**
+         * Check if subDir is directory and recursively add frame from that folder too
+         */ else if ((await fs.promises.lstat(subDir)).isDirectory())
+          await this.addFrames(subDir, `${prefix}/${_subDir}`);
+        else console.log("Texture Packer", subDir, "not supported, skipping");
+      })
     );
-
-    /**
-     * Add Frame
-     */
-    const frame: Frame = {
-      name,
-      trimmed: false,
-      frame: { x: 0, y: 0, w, h },
-      sourceSize: { w, h },
-      spriteSourceSize: { x: 0, y: 0, w, h },
-      /** Only Save reference to original image to free up current one from memory */
-      image: originalFrame?.image || image,
-      original: originalFrame,
-    };
-
-    /** Save */
-    this.frames.push(frame);
   }
 
-  static readonly TEMP_ASSET_PATH = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+  private async addFrame(name: string, framePath: string) {
+    const image = new PNG({
+      filterType: 4,
+    });
+
+    await new Promise<void>((res) => {
+      fs.createReadStream(framePath)
+        .pipe(image)
+        .on("parsed", () => {
+          const { width: w, height: h } = image;
+
+          /**
+           * Check if we have identical frame already stored
+           */
+          const originalFrame = this.frames.find((frame) =>
+            frame.image.data.equals(image.data)
+          );
+
+          /**
+           * Add Frame
+           */
+          const frame: Frame = {
+            name,
+            trimmed: false,
+            frame: { x: 0, y: 0, w, h },
+            sourceSize: { w, h },
+            spriteSourceSize: { x: 0, y: 0, w, h },
+            /** Only Save reference to original image to free up current one from memory */
+            image: originalFrame?.image || image,
+            original: originalFrame,
+          };
+
+          /** Save */
+          this.frames.push(frame);
+
+          res();
+        });
+    });
+  }
+
+  static readonly TEMP_ASSET_PATH = path.join(__dirname, "../output"); // fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
   /**
    * Construct the file name associated with hash for saving JSON or textures in temp location
    *

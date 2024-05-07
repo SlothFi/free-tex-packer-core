@@ -62,8 +62,8 @@ class Trimmer {
   static trim(rects, threshold = 0) {
     for (let item of rects) {
       let img = item.image;
-      let data = img.bitmap.data;
-      const { width, height } = img.bitmap;
+      let data = img.data;
+      const { width, height } = img;
       let spaces = { left: 0, right: 0, top: 0, bottom: 0 };
 
       spaces.left = this.getLeftSpace(data, width, height, threshold);
