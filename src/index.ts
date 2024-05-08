@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { PNG } from "pngjs";
 import { TexturePackerOptions } from "./types";
@@ -249,7 +250,7 @@ export default class OptimizedTexturePacker {
     });
   }
 
-  static readonly TEMP_ASSET_PATH = path.join(__dirname, "../output"); // fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+  static readonly TEMP_ASSET_PATH = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
   /**
    * Construct the file name associated with hash for saving JSON or textures in temp location
    *
