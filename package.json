@@ -1,6 +1,6 @@
 {
   "name": "@slothfi/texture-packer",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "scripts": {
     "build": "tsc"
   },
