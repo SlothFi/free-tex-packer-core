@@ -10,12 +10,15 @@
     "lib/**/*"
   ],
   "dependencies": {
+    "fast-string-compare": "^3.0.0",
     "fs": "^0.0.1-security",
     "glob": "^10.3.12",
     "maxrects-packer": "^2.7.3",
+    "murmurhash-js": "^1.0.0",
     "pngjs": "^7.0.0"
   },
   "devDependencies": {
+    "@types/murmurhash-js": "^1.0.6",
     "@types/node": "^13.1.0",
     "@types/pngjs": "^6.0.5",
     "typescript": "^5.0.4"
