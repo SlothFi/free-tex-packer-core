@@ -1,18 +1,22 @@
-import murmur from "murmurhash-js";
-import { compare } from "fast-string-compare";
-
 import { Frame } from ".";
+import murmur from "murmurhash-js";
+import { inPlaceSort } from "fast-sort";
 
 /**
  * Hash Unordered array of frames with unique names
  */
 export function hashFrames(frames: Frame[]) {
-  return murmur
-    .murmur3(
-      frames
-        .sort((frameA, frameB) => frameA.name.localeCompare(frameB.name))
-        .join(","),
-      123
-    )
-    .toString();
+  /**
+   * Sort Frames by name
+   */
+  inPlaceSort(frames).asc((frame) => frame.name);
+
+  /** Concatenate all frame names */
+  let str = "";
+  for (const { name } of frames) str += name + ",";
+
+  /**
+   * Generate Hash
+   */
+  return murmur.murmur3(str, 123).toString(16);
 }
