@@ -1,6 +1,6 @@
 {
   "name": "@slothfi/texture-packer",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "scripts": {
     "build": "tsc"
   },
@@ -10,7 +10,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "fast-string-compare": "^3.0.0",
+    "fast-sort": "^3.4.0",
     "fs": "^0.0.1-security",
     "glob": "^10.3.12",
     "maxrects-packer": "^2.7.3",
